@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>お眠り大臣†ねむむ† - 進化の儀</title>
+  <style>
+    body {
+      background: black;
+      color: white;
+      text-align: center;
+      font-family: "Georgia", serif;
+      padding: 2em;
+    }
+    .fade {
+      opacity: 0;
+      transition: opacity 2s;
+    }
+    .show {
+      opacity: 1;
+    }
+    #evo-img {
+      width: 200px;
+      margin-top: 2em;
+      display: none;
+    }
+    #message {
+      font-size: 1.2em;
+      margin-top: 2em;
+      white-space: pre-wrap;
+    }
+    button {
+      margin-top: 2em;
+      padding: 0.8em 1.5em;
+      font-size: 1em;
+      background: #222;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>お眠り大臣†ねむむ†</h1>
+  <div id="message"></div>
+  <img id="evo-img" src="" alt="進化スヤモン">
+  <button id="next" onclick="goBack()">ねむむと共に帰還する</button>
+
+  <script>
+    const suyado = parseInt(localStorage.getItem("suyado") || "20");
+    const prevStage = parseInt(localStorage.getItem("evolutionStage") || "1");
+
+    function getStage(score) {
+      if (score >= 50) return 3;
+      if (score >= 35) return 2;
+      return 1;
+    }
+
+    const nowStage = getStage(suyado);
+
+    const evolutions = {
+      2: {
+        img: "evo2.png",
+        msg: "……あれ？ ボクのこと、ちゃんと見えてる……？\n\nうれしい…ボク、ずっと、きみのそばにいたよ"
+      },
+      3: {
+        img: "evo3.png",
+        msg: "……もう、きみがいない夜は、生きていけない\n\nこれからはずっと…夢のなかでも、現実でも──ボクは、きみと一緒。"
+      }
+    };
+
+    const evo = evolutions[nowStage];
+
+    if (nowStage > prevStage && evo) {
+      document.getElementById("message").textContent = "……スヤモンの様子が……！？";
+      setTimeout(() => {
+        document.getElementById("message").textContent = evo.msg;
+        const img = document.getElementById("evo-img");
+        img.src = evo.img;
+        img.style.display = "block";
+        img.classList.add("fade");
+        setTimeout(() => img.classList.add("show"), 50);
+        document.getElementById("next").style.display = "inline-block";
+        localStorage.setItem("evolutionStage", nowStage);
+      }, 3000);
+    } else {
+      document.getElementById("message").textContent = "現在、ねむむに変化はないようだ。";
+      document.getElementById("next").style.display = "inline-block";
+    }
+
+    function logSleep(sleepType) {
+  if (!canLogToday()) {
+    alert("今日はもう記録済みだよ。明日8時以降にまた来てね！");
+    return;
+  }
+
+  const prevStage = parseInt(localStorage.getItem("evolutionStage") || "1", 10);
+  let delta = 0;
+  if (sleepType === "寝た") delta = 2;
+  else if (sleepType === "ちょっと寝た") delta = 1;
+  else if (sleepType === "寝てない") delta = -1;
+
+  let suyado = parseInt(localStorage.getItem("suyado") || "20", 10);
+  suyado = Math.max(0, Math.min(50, suyado + delta)); // 上限50
+  localStorage.setItem("suyado", suyado);
+  localStorage.setItem("lastLogTime", new Date().toISOString());
+
+  const nowStage = getStage(suyado);
+  if (nowStage > prevStage) {
+    // 進化演出ページへ！
+    location.href = "evolution.html";
+  } else {
+    // 通常どおりトークページへ
+    location.href = "talk.html";
+  }
+}
+<div id="progress-container">
+  <p id="progress-text"></p>
+  <div style="width: 100%; background: #333;">
+    <div id="progress-bar" style="height: 10px; width: 0; background: #6cf;"></div>
+  </div>
+</div>
+
+
+    function goBack() {
+      location.href = "talk.html";
+    }
+  </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>お眠り大臣†ねむむ† - 進化の儀</title>
+  <style>
+    body {
+      background: black;
+      color: white;
+      text-align: center;
+      font-family: "Georgia", serif;
+      padding: 2em;
+    }
+    button {
+      margin: 1em;
+      padding: 1em 2em;
+      font-size: 1em;
+      background: #222;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    #evo-img {
+      width: 200px;
+      margin-top: 2em;
+      display: none;
+    }
+    #message {
+      font-size: 1.2em;
+      margin-top: 2em;
+      white-space: pre-wrap;
+    }
+    #next {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+    <div id="name-entry" style="margin-bottom: 2em;">
+        <p>あなたのお名前を教えてください（○○さんと呼ばせてください）</p>
+        <input id="username" placeholder="例：ニモニム" />
+        <button onclick="saveName()">登録する</button>
+      </div>
+      
+  <h1>お眠り大臣†ねむむ†</h1>
+  <h2>今日の眠りはどうだった？</h2>
+  <div id="sleep-buttons">
+    <button onclick="logSleep('寝た')">🌙 寝た</button>
+    <button onclick="logSleep('ちょっと寝た')">💤 ちょっと寝た</button>
+    <button onclick="logSleep('寝てない')">😵 寝てない</button>
+  </div>
+  <div id="message"></div>
+  <img id="evo-img" src="" alt="進化スヤモン">
+  <button id="next" onclick="goBack()">ねむむと共に帰還する</button>
+
+  <script>
+
+function saveName() {
+  const name = document.getElementById("username").value.trim();
+  if (!name) {
+    alert("名前を入力してください！");
+    return;
+  }
+  localStorage.setItem("suyamonUserName", name);
+  document.getElementById("name-entry").style.display = "none";
+  document.getElementById("sleep-buttons").style.display = "block";
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  const saved = localStorage.getItem("suyamonUserName");
+  if (saved) {
+    document.getElementById("name-entry").style.display = "none";
+    document.getElementById("sleep-buttons").style.display = "block";
+  } else {
+    document.getElementById("sleep-buttons").style.display = "none";
+  }
+});
+
+    function canLogToday() {
+      const lastLog = localStorage.getItem("lastLogTime");
+      if (!lastLog) return true;
+      const last = new Date(lastLog);
+      const now = new Date();
+      const lastReset = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8);
+      if (now < lastReset) lastReset.setDate(lastReset.getDate() - 1);
+      return last < lastReset;
+    }
+
+    function getStage(score) {
+      if (score >= 50) return 3;
+      if (score >= 35) return 2;
+      return 1;
+    }
+
+    function logSleep(type) {
+      if (!canLogToday()) {
+        alert("今日はもう記録済みだよ。明日8時以降にまた来てね！");
+        return;
+      }
+      let delta = 0;
+      if (type === "寝た") delta = 2;
+      else if (type === "ちょっと寝た") delta = 1;
+      else if (type === "寝てない") delta = -1;
+
+      let suyado = parseInt(localStorage.getItem("suyado") || "20", 10);
+      suyado = Math.max(0, Math.min(50, suyado + delta));
+      localStorage.setItem("suyado", suyado);
+      localStorage.setItem("lastLogTime", new Date().toISOString());
+
+      const prevStage = parseInt(localStorage.getItem("evolutionStage") || "1", 10);
+      const nowStage = getStage(suyado);
+
+      if (nowStage > prevStage) {
+        const evolutions = {
+          2: {
+            img: "evo2.png",
+            msg: "……あれ？ ボクのこと、ちゃんと見えてる……？\n\nうれしい…ボク、ずっと、きみのそばにいたよ"
+          },
+          3: {
+            img: "evo3.png",
+            msg: "……もう、きみがいない夜は、生きていけない\n\nこれからはずっと…夢のなかでも、現実でも──ボクは、きみと一緒。"
+          }
+        };
+
+        const evo = evolutions[nowStage];
+        document.getElementById("message").textContent = "……スヤモンの様子が……！？";
+        setTimeout(() => {
+          document.getElementById("message").textContent = evo.msg;
+          const img = document.getElementById("evo-img");
+          img.src = evo.img;
+          img.style.display = "block";
+          document.getElementById("next").style.display = "inline-block";
+          localStorage.setItem("evolutionStage", nowStage);
+        }, 3000);
+      } else {
+        location.href = "talk.html";
+      }
+    }
+
+    function goBack() {
+      location.href = "talk.html";
+    }
+  </script>
+</body>
+</html>

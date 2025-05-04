@@ -1,0 +1,48 @@
+body {
+  background: #0e0e1a;
+  color: #f8f8f8;
+  font-family: "Georgia", serif;
+  text-align: center;
+  padding: 2em;
+}
+
+button {
+  background: #4444aa;
+  color: white;
+  border: none;
+  padding: 1em 2em;
+  font-size: 1.2em;
+  border-radius: 12px;
+  margin-top: 1.5em;
+  cursor: pointer;
+}
+
+a {
+  color: #aaaaff;
+  text-decoration: none;
+}
+
+#sleep-input {
+  margin-top: 2em;
+}
+
+#sleep-input button {
+  margin: 0.5em;
+  font-size: 1em;
+  padding: 0.7em 1.2em;
+  border-radius: 10px;
+  border: none;
+  background-color: #333355;
+  color: #fff;
+  cursor: pointer;
+}
+
+.reaction {
+  margin-top: 1em;
+  font-style: italic;
+  color: #ddddff;
+}
+
+.gauge-wrapper {
+  margin-top: 2em;
+}

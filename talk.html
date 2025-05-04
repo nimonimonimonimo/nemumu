@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>お眠り大臣†ねむむ†とお話し</title>
+  <style>
+    body {
+      background-color: #111;
+      color: #eee;
+      font-family: "游ゴシック", sans-serif;
+      text-align: center;
+      padding: 2em;
+    }
+    #dialogue-box {
+      font-size: 1.4em;
+      margin-bottom: 1em;
+      min-height: 4em;
+    }
+    button {
+      padding: 1em 2em;
+      font-size: 1em;
+      background-color: #333;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 1em;
+    }
+    #progress-container {
+      margin-top: 2em;
+    }
+    #progress-bar {
+      height: 10px;
+      background-color: #88f;
+      border-radius: 5px;
+      width: 0;
+      transition: width 0.5s ease;
+    }
+  </style>
+</head>
+<body>
+  <h1>今日のねむむ</h1>
+  <div id="dialogue-box">……</div>
+  <button onclick="moreTalk()">もっと喋る</button>
+
+  <div id="progress-container">
+    <p id="progress-text">読破率：--%</p>
+    <div style="width: 80%; margin: 0 auto; background: #222; border-radius: 5px;">
+      <div id="progress-bar"></div>
+    </div>
+  </div>
+
+  <script>
+    const suyado = parseInt(localStorage.getItem("suyado") || "20", 10);
+    const stage = suyado >= 50 ? 3 : suyado >= 35 ? 2 : 1;
+    const userName = localStorage.getItem("suyamonUserName") || "○○";
+    const shownKey = `shownLines_stage${stage}`;
+    const shownIndexes = JSON.parse(localStorage.getItem(shownKey) || "[]");
+
+    function moreTalk() {
+      fetch("data/lines.json")
+        .then(res => res.json())
+        .then(data => {
+          const lines = data[`stage${stage}`];
+          const availableIndexes = lines
+            .map((_, i) => i)
+            .filter(i => !shownIndexes.includes(i));
+
+          if (availableIndexes.length === 0) {
+            document.getElementById("dialogue-box").textContent = "今日はもう全部話しちゃった…また明日ね";
+            return;
+          }
+
+          const randIndex = availableIndexes[Math.floor(Math.random() * availableIndexes.length)];
+          const selected = lines[randIndex].replace(/○○さん/g, `${userName}さん`);
+          document.getElementById("dialogue-box").textContent = selected;
+          shownIndexes.push(randIndex);
+          localStorage.setItem(shownKey, JSON.stringify(shownIndexes));
+          updateProgress(stage, lines.length);
+        });
+    }
+
+    function updateProgress(stage, totalCount) {
+      const shown = JSON.parse(localStorage.getItem(`shownLines_stage${stage}`) || "[]");
+      const percent = Math.floor((shown.length / totalCount) * 100);
+      document.getElementById("progress-text").textContent = `読破率：${shown.length}/${totalCount}（${percent}%）`;
+      document.getElementById("progress-bar").style.width = `${percent}%`;
+    }
+
+    fetch("data/lines.json")
+      .then(res => res.json())
+      .then(data => {
+        const total = data[`stage${stage}`].length;
+        updateProgress(stage, total);
+      });
+  </script>
+</body>
+</html>
